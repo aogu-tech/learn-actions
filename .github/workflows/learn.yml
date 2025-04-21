@@ -1,10 +1,9 @@
-name GitHub Actions Demo 
+name: GitHub Actions Demo
 
-on:[push]
+on: [push]
 
 jobs:
- echo_hello_world:
-   runs-on: unbuntu-latest
-   steps:
-     -run: echo "hello wolrd!!"
-
+    echo_hello_world:
+        runs-on: ubuntu-latest
+        steps:
+            - run: echo "hello world!!"
