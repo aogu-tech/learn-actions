@@ -1,9 +1,23 @@
-name: GitHub Actions Demo
+name: Run JavaScript in GitHub Actions
 
-on: [push]
+on:
+    push:
+        branches:
+            - main
 
 jobs:
-    echo_hello_world:
+    setup_and_run_script:
         runs-on: ubuntu-latest
         steps:
-            - run: echo "hello world!!"
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Run script
+              run: node index.js
