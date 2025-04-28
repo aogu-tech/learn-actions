@@ -3,37 +3,38 @@ name: Run JavaScript in GitHub Actions
 on:
     push:
         branches: [main]
+env:
+    TEMPLATE_FILE: template.yaml
+    SAM_CLI_TELEMETRY: 0
+
+permissions:
+    id-token: write
+    contents: read
 
 jobs:
-    setup_and_run_script:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 22
-
-            - name: Install pnpm
-              uses: pnpm/action-setup@v4
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run script
-              run: node index.js
-
     s3ls:
         runs-on: ubuntu-latest
         permissions:
             id-token: write
             contents: read
         steps:
-            - uses: aws-actions/configure-aws-credentials@v1
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - uses: aws-actions/setup-sam@v2
+              with:
+                  use-installer: true
+
+            - uses: aws-actions/configure-aws-credentials@v4
               with:
                   aws-region: "ap-northeast-1" # リージョンを指定
                   role-to-assume: "arn:aws:iam::058264266727:role/oicd-actions" # 作成した IAM ロールの ARN
 
-            # プライベートな S3 バケットを読み取ってみる
-            - run: aws s3 ls s3://tomoko-frontend
+            #  buildとdeployを実行
+            - run: sam build
+            - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
